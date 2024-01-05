@@ -33,12 +33,25 @@ const checkWin = () => {
     })
 }
 
+
+// Add this debounce function at the top of your script
+const debounce = (func, delay) => {
+    let debounceTimer;
+    return function () {
+        clearTimeout(debounceTimer);
+        const context = this;
+        const args = arguments;
+        debounceTimer = setTimeout(() => func.apply(context, args), delay);
+    };
+};
+
+
 //Main Game  Logic 
 /* music.play(); */
 let boxes = document.getElementsByClassName("box");
 Array.from(boxes).forEach(element => {
     let boxtexts = element.querySelector('.boxtext');
-    element.addEventListener('click', () => {
+    element.addEventListener('click', debounce(() => {
         if (boxtexts.innerText === '') {
             boxtexts.innerText = turn;
             turn = changeTurn();
@@ -48,7 +61,7 @@ Array.from(boxes).forEach(element => {
                 document.getElementsByClassName("info")[0].innerText = "Turn for " + turn;
             }
         }
-    })
+    },300));  /* 300 millisec debounce added */
 })
 
 //reset button
