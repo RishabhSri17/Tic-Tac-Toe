@@ -1,40 +1,62 @@
-console.log("Welcome to Tic Tac Toe")
-let music = new Audio("bgm.mp3")
-let turnm = new Audio("move.mp3")
-let game_over = new Audio("game_over.mp3")
+console.log("Welcome to Tic Tac Toe");
 
-let turn = "X"
+const music = new Audio("bgm.mp3");
+const turnm = new Audio("move.mp3");
+const game_over = new Audio("game_over.mp3");
+
+let turn = "X";
 let gameOver = false;
 
-//Function to change turn
+// Function to change turn
 const changeTurn = () => {
-    return turn === "X" ? "0" : "X"
-}
+    return turn === "X" ? "O" : "X";
+};
 
-//function to check for a win
+// Function to check for a win or draw
 const checkWin = () => {
-    let boxtext = document.getElementsByClassName("boxtext");
-    let wins = [
+    const boxtext = document.getElementsByClassName("boxtext");
+    const wins = [
         [0, 1, 2, 0, 5, 0], [2, 5, 8 , 10 , 15 , 90],
         [6, 7, 8, 0, 25, 0], [0, 3, 6 , -10 , 15 , 90],
         [1, 4, 7 , 0 , 15 , 90], [3, 4, 5, 0, 15, 0],
         [0, 4, 8 , 0 , 15 , 45], [2, 4, 6 , 0 , 15 , -45]
-    ]
+    ];
+
+    let isDraw = true;
 
     wins.forEach(e => {
-        if (boxtext[e[0]].innerText === boxtext[e[1]].innerText && boxtext[e[1]].innerText === boxtext[e[2]].innerText && boxtext[e[1]].innerText != 0) {
+        if (boxtext[e[0]].innerText === boxtext[e[1]].innerText && 
+            boxtext[e[1]].innerText === boxtext[e[2]].innerText && 
+            boxtext[e[1]].innerText !== "") {
             document.querySelector('.info').innerText = boxtext[e[0]].innerText + " Won";
             gameOver = true;
             game_over.play();
             document.querySelector('.imgbox').getElementsByTagName('img')[0].style.width = "12rem";
-            document.querySelector('.line').style.width= `30vw`
-            document.querySelector('.line').style.transform = `translate(${e[3]}vw, ${e[4]}vw) rotate(${e[5]}deg)`
+            document.querySelector('.line').style.width = `30vw`;
+            document.querySelector('.line').style.transform = `translate(${e[3]}vw, ${e[4]}vw) rotate(${e[5]}deg)`;
+            isDraw = false; // If there's a winning combination, it's not a draw
         }
-    })
-}
+    });
 
+    // Check for a draw if no winning combination found
+    if (isDraw) {
+        let allBoxesFilled = true;
+        Array.from(boxtext).forEach(box => {
+            if (box.innerText === "") {
+                allBoxesFilled = false;
+                return;
+            }
+        });
 
-// Add this debounce function at the top of your script
+        if (allBoxesFilled) {
+            document.querySelector('.info').innerText = "It's a draw!";
+            gameOver = true;
+            // You can add any additional logic for handling a draw here
+        }
+    }
+};
+
+// Debounce function
 const debounce = (func, delay) => {
     let debounceTimer;
     return function () {
@@ -45,12 +67,10 @@ const debounce = (func, delay) => {
     };
 };
 
-
-//Main Game  Logic 
-/* music.play(); */
-let boxes = document.getElementsByClassName("box");
+// Main Game Logic
+const boxes = document.getElementsByClassName("box");
 Array.from(boxes).forEach(element => {
-    let boxtexts = element.querySelector('.boxtext');
+    const boxtexts = element.querySelector('.boxtext');
     element.addEventListener('click', debounce(() => {
         if (boxtexts.innerText === '') {
             boxtexts.innerText = turn;
@@ -61,18 +81,19 @@ Array.from(boxes).forEach(element => {
                 document.getElementsByClassName("info")[0].innerText = "Turn for " + turn;
             }
         }
-    },300));  /* 300 millisec debounce added */
-})
+    }, 300));  // 300 milliseconds debounce added
+});
 
-//reset button
+// Reset button
+const reset = document.querySelector('#reset');
 reset.addEventListener('click', () => {
-    let boxtexts = document.querySelectorAll('.boxtext');
+    const boxtexts = document.querySelectorAll('.boxtext');
     Array.from(boxtexts).forEach(element => {
-        element.innerText = ""
+        element.innerText = "";
     });
     turn = "X";
     gameOver = false;
-    document.getElementsByClassName("info")[0].innerText = "Turn for" + turn;
+    document.querySelector('.info').innerText = "Turn for " + turn;
     document.querySelector('.imgbox').getElementsByTagName('img')[0].style.width = "0";
-    document.querySelector('.line').style.width= `0vw`
-})
+    document.querySelector('.line').style.width = `0vw`;
+});
